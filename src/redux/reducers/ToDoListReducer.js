@@ -26,11 +26,8 @@ export const  ToDoListReducer =  (state = initialState, action) => {
             return {...state}
         }
         case CHANGE_THEME : {
-            let theme = arrTheme.find(theme => theme.id === action.themId)
-            console.log(theme)
+            let theme = arrTheme.find(theme => theme.id === Number(action.themeId))
             if(theme){
-                console.log("ra kqya")
-                console.log(theme)
                 state.themeToDoList = {...theme.theme}
             }
 
