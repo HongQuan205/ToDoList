@@ -1,9 +1,8 @@
 import styled from "styled-components";
-import React from 'react'
 
 export const Input = styled.input`
-    border: 1px solid ${props => props.theme.color};
-    min-height: 35px;
+    border: 1px solid ${props => props.theme.color}
+    min-height: 35px'
     height: 35px;
     font-size: 17px;
     width: auto;
@@ -11,16 +10,15 @@ export const Input = styled.input`
 `
 
 export const Label = styled.span`
-    color: ${props => props.theme.color}
-    width : auto;
+    color: ${props => props.theme.color};
+    widh: auto;
 `
-
-export const TextFiled = ({label, ...props}) =>{
+export const TextField = ({label, ...props}) =>{
     return <span>
         <Label>
             {label}
         </Label>
         <br/>
-        <Input {...props}/>
+        <Input {...props} />
     </span>
 }

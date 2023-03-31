@@ -3,15 +3,17 @@ import { Container } from "./component/Container";
 import { ThemeProvider } from "styled-components";
 import { connect } from 'react-redux';
 import { Dropdown } from "./ToDoListComponent/Dropdown";
-import { Button } from "./ToDoListComponent/Button";
+import { Button,ButtonToDoList } from "./ToDoListComponent/Button";
 import { TextFiled} from "./ToDoListComponent/TextFiled";
-import { Th, Tr } from "./ToDoListComponent/Table";
+import { Table, Th, Thead, Tr } from "./ToDoListComponent/Table";
+import moment from 'moment';
 import {
   addTaskAction,
   changeThemeAction,
   deleteTaskAction,
   doneTaskAction,
   editTaskAction,
+  updateTask,
 } from "../redux/actions/ToDoListActions";
 import { arrTheme } from "./themes/ThemeManager";
 import {
@@ -21,61 +23,61 @@ import {
 class ToDoList extends Component {
   state = {
     taskName: "",
-    disable: true,
+    disabled: true,
   };
 
-  componentDidMount() {
-    console.log("componentWillMount da chay")
+
+
+  renderTaskToDo = () => {
+    return this.props.taskList.filter(task => !task.done).map((task,index) =>{
+        return <Tr key = {index}>
+         <Th style={{verticalAlign: 'middle'}}>
+            {task.taskName.toUpperCase()}
+         </Th>
+         <Th className="text-right">
+            <ButtonToDoList onClick={() =>{
+              this.setState({
+                disabled:false
+              }, () =>{
+                console.log(this.state)
+                this.props.dispatch(editTaskAction(task))
+              })
+            }} className = "ml-1"> <i className="fa fa-edit"></i>
+
+            </ButtonToDoList>
+
+            <ButtonToDoList onClick={() =>{
+                this.props.dispatch(doneTaskAction(task.id))
+            }} className="ml-1"> <i className="fa fa-check"></i></ButtonToDoList>
+
+            <ButtonToDoList onClick={() =>{
+              this.props.dispatch(deleteTaskAction(task.id))
+            }}>
+              <i className="fa fa-trash"></i>
+            </ButtonToDoList>
+         </Th>
+        </Tr>
+    })
   }
 
-  // renderTaskToDo = () => {
-  //   return this.props.taskList
-  //     .filter((task) => !task.done)
-  //     .map((task, index) => {
-  //       return (
-  //         <Tr key={index}>
-  //           <Th style={{ verticalAlign: "middle" }}>{task.taskName}</Th>
-  //           <Th className="text-right">
-  //             <Button
-  //               onClick={() => {
-  //                 this.setState({disabled: false},() => {this.props.dispatch(editTaskAction(task))})
-  //             }}
-  //               className="ml-1"
-  //             >
-  //               {" "}
-  //               <i className="fa fa-check"></i>
-  //             </Button>
+  renderCompletedTask = () =>{
+      return this.props.taskList.filter(task => task.done).map((task,index) =>{
+        return <Tr key = {index}>
+          <Th style={{verticalAlign:'middle'}}>
+            {task.taskName.toUpperCase()}
+          </Th>
+          <Th className="text-right">
+          <ButtonToDoList  onClick={() =>{
+              this.props.dispatch(deleteTaskAction(task.id))
+            }}>
+              <i className="fa fa-trash"></i>
+            </ButtonToDoList>
+          </Th>
+        </Tr>
+      })
+  }
 
-  //             <Button onClick={() => { this.props.dispatch(doneTaskAction(task.id))}}
-  //               className="ml-1">
-  //               {" "}
-  //               <i className="fa fa-check"></i>
-  //             </Button>
-
-  //             <Button
-  //               onClick={() => { this.props.dispatch(deleteTaskAction(task.id))}}
-  //               className="ml-1">
-  //               <i className="fa fa-trash"></i>
-  //             </Button>
-  //           </Th>
-  //         </Tr>
-  //       );
-  //     });
-  // };
-
-  // renderTaskCompleted = () => {
-  //   return this.props.taskList
-  //     .filter((task) => task.done)
-  //     .map((task, index) => {
-  //       return (
-  //         <Tr key={index}>
-  //           <Th style={{ verticalAlign: "middle" }}>{task.taskName}</Th>
-  //         </Tr>
-  //       )
-  //     })
-  // }
-
-  renderTheme = () => {
+  renderThemeDropdown = () => {
     return arrTheme.map((theme, index) => {
       return (
         <option key={index} value={theme.id}>
@@ -95,35 +97,76 @@ class ToDoList extends Component {
                 let { value } = e.target
                 this.props.dispatch(changeThemeAction(value))
               }}>
-              {this.renderTheme()}
+              {this.renderThemeDropdown()}
             </Dropdown>
             <Heading3>To do list</Heading3>
-            {/* <TextFiled value={this.state.taskName} onChange={(e) => { this.setState({
-                taskName: e.target.value},() => {
-                    console.log(this.state);
-                  }
-                )
-              }} name="taskName" label="Task name"className="w-50" >
-              <Button onClick={() => {  let { taskName } = this.state; 
+            <TextFiled value = {this.state.taskName} onChange = {(e) =>{
+                this.setState({
+                  taskName: e.target.value
+                })
+            }} name = "taskName" label="Task Name" className = "w-50" />
+
+            <ButtonToDoList onClick={ () =>{
+
+              let {taskName} = this.state
+
               let newTask = {
-                    id: Date.now(),
-                    taskName: taskName,
-                    done: false,
-                  }
-                  this.props.dispatch(addTaskAction(newTask));
-                }} className="ml-2">
-                  
-                <i className="fa fa-plus">Add task</i>
-              </Button>
-            </TextFiled> */}
+                id: moment().format('DD/MM/YYYY hh:mm:ss'),
+                taskName: taskName,
+                done: false
+              }
+              this.props.dispatch(addTaskAction(newTask))
+            }} className= "ml-2">
+              <i className="fa fa-plus"></i>
+              Add Task
+            </ButtonToDoList>
+            {
+              this.state.disabled ? <ButtonToDoList disabled className="ml-2">Update Task</ButtonToDoList> : 
+              <ButtonToDoList onClick={() =>{
+                let {taskName} = this.state
+                this.setState({
+                  disabled: true,
+                  taskName:this.state.taskName
+                }, () =>{
+                  this.props.dispatch(updateTask(taskName))
+                })
+              }}>
+                Update Task
+              </ButtonToDoList>
+            }
+
+            <hr/>
+            <Heading3>Task to do</Heading3>
+            <Table>
+              <Thead>
+               {this.renderTaskToDo()}
+              </Thead>
+            </Table>
+
+            <Heading3>Task completed</Heading3>
+            <Table>
+              <Thead>
+               {this.renderCompletedTask()}
+              </Thead>
+            </Table>
           </Container>
         </ThemeProvider>
       )
     }
+
+    componentDidUpdate(prevProps, prevState ){
+      if(prevProps.taskEdit.id !== this.props.taskEdit.id){
+        this.setState({
+          taskName: this.props.taskEdit.taskName
+        })
+      }
+    }
 }
 
 
+
 const mapStateToProps = (state) =>{
+  console.log(state.ToDoListReducer.taskList)
   return {
     themeToDoList : state.ToDoListReducer.themeToDoList,
     taskList: state.ToDoListReducer.taskList,

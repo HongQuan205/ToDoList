@@ -22,7 +22,7 @@ export const doneTaskAction = (taskId) =>{
 }
 
 export const deleteTaskAction = (taskId) =>({
-    type: DONE_TASK,
+    type: DELETE_TASK,
     taskId,
 })
 

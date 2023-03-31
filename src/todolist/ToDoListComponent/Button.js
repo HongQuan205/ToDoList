@@ -15,6 +15,23 @@ export const Button = styled.button`
         }
 `
 
+export const ButtonToDoList = styled.button`
+    apperance : none;
+    background-color : ${props => props.theme.bgColor};
+    color: ${props => props.theme.color};
+    padding: .25em .5em;
+    transition: all .5s;
+    font-size: 17px;
+    &:hover{
+        color: ${props => props.theme.hoverTextColor};
+        background-color: ${props => props.theme.hoverBgColor};
+        border: ${props => props.theme.borderButton}
+    };
+    &:disabled {
+        cursor: no-drop
+    }
+`
+
 export const SmallButton = styled(Button)`
         background-color: orange;
         font-size: 0.5rem;

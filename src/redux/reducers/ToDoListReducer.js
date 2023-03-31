@@ -6,7 +6,7 @@ import { arrTheme } from "../../todolist/themes/ThemeManager";
 const initialState = {
     themeToDoList: ToDoListDarkTheme,
     taskList : [
-        {id:'task-1', taskName: 'task 1', done: true},
+        {id:'task-1', taskName: 'task 1', done: false},
         {id:'task-2', taskName: 'task 2', done: false},
         {id:'task-3', taskName: 'task 3', done: false},
         {id:'task-4', taskName: 'task 4', done: true},        
@@ -17,13 +17,17 @@ const initialState = {
 export const  ToDoListReducer =  (state = initialState, action) => {
     switch(action.type){
         case ADD_TASK : {
+            console.log(action.newTask)
             if(action.newTask.taskName.trim() === '')
             {
-               alert('Task name is required')
                return {...state}
             }
-
-            return {...state}
+            let isExistedTask = state.taskList.find((task) => task.taskName.toUpperCase() === action.newTask.taskName.toUpperCase())
+            if(isExistedTask){
+                alert("Task name is existed")
+                return {...state}
+            }
+            return {...state, taskList :[...state.taskList, action.newTask]}
         }
         case CHANGE_THEME : {
             let theme = arrTheme.find(theme => theme.id === Number(action.themeId))
@@ -34,7 +38,7 @@ export const  ToDoListReducer =  (state = initialState, action) => {
             return {...state}
         }
 
-        case DONE_TASK :{
+        case DONE_TASK : {
             let taskListUpdate = [...state.taskList]
 
             let index = taskListUpdate.findIndex(task => task.id === action.taskId)
@@ -52,19 +56,21 @@ export const  ToDoListReducer =  (state = initialState, action) => {
         }
 
         case UPDATE_TASK : {
-            state.taskEdit = {...state.taskEdit, taskName: action.taskName}
+            const updateTaskName = {...state.taskEdit, taskName: action.taskName}
+            const updateTaskList = state.taskList.map(task => {
+                if(task.id == updateTaskName.id){
+                    return updateTaskName
+                }
+                return task
+            })
 
-            let taskListUpdate = [...state.taskList]
-            let index = taskListUpdate.findIndex(task => task.id === state.taskEdit.id)
-
-            if(index !== -1)
-            {
-                taskListUpdate[index] = state.taskEdit
+            console.log(updateTaskList)
+            console.log(updateTaskName)
+            return {
+                ...state,
+                taskEdit: {id:-1, taskName:'', done: false},
+                taskList: updateTaskList
             }
-
-            state.taskEdit = taskListUpdate
-            state.taskEdit = {id : '-1', taskName:'', done: false}
-            return {...state}
         }
 
         default : 
